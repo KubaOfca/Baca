@@ -1,9 +1,11 @@
 //Jakub Baran - 8
+//Idea dzialania programu
+
 import java.util.Scanner;
 
 class Source {
     public static Scanner scn = new Scanner(System.in);
-    
+
     private static char[] signs = new char[]   {'.','(',')','!','~','^','%','/','*','-','+','>','<','?','&','|','='}; //index 0 najmnieszy piorytet !
     private static int[] rankOfSign = new int[]{  9,  0,  0,  8,  8,  7,  6,  6,  6,  5,  5,  4,  4,  3,  2,  1, 0};
     private static char[] rightSide = new char[] {'!','~','=','^'};
