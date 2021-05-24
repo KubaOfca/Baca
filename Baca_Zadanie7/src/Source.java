@@ -1,5 +1,12 @@
 //Jakub Baran - 8
 
+/* Idea dzialania programu
+Program ma za zadanie posortowac wiersze tabeli tsv w oparciu o zadana kolumne. Program moze w zaleznosci od modyfikatora
+wyswietlic cala tablice po posortowaniu, lub poszczegolna kolumne wedlug ktorej odbywa sie sortowanie. Dane wyswietalne
+sa w formacie 0.####. Czesc dziesietna jest odzielona przecinkiem.
+
+ */
+
 import java.text.DecimalFormat;
 import java.util.Locale;
 import java.util.Scanner;
@@ -36,12 +43,12 @@ class Source {
                 for (int j = 0; j < tsvColumnName.length; j++) { // wyszukanie indeksu kolumny ktora ma byc posortowana
                     if (tsvColumnName[j].equals(SortByColumn)) {
                         find = true;
-                        quickSort(tsvTable, 0, rows - 1, j); // zastosowanie quick sort
-                        displayTsvTable(tsvColumnName, tsvTable, columns, rows, modifier, SortByColumn, j);
-                        break;
+                        quickSort(tsvTable, 0, rows - 1, j); // sortowanie metoda -  quick sort
+                        displayTsvTable(tsvColumnName, tsvTable, columns, rows, modifier, SortByColumn, j); // wyswietlenie tabeli
+                        break; // wyjscie z pentli poniewaz znalezlismy indeks kolumny dla ktorego zastosowalismy sortowanie.
                     }
                 }
-                if(find == false){
+                if(find == false){ // jezeli find nie bedzie == true to znaczy ze dana kolumna nie istnieje w zadanej tabeli
                     System.out.println("$ " + modifier + " " + SortByColumn);
                     System.out.println("invalid column name: " + SortByColumn);
                 }
@@ -62,14 +69,14 @@ class Source {
         while (true) {
             end--;
             while (l < tempR) {
-                if (tempR - l + 1 <= 20) {
+                if (tempR - l + 1 < 20) { // jezli podtablica ma mniej niz 20 elementow, sortujemy ja insertion sortem
                     insertionSort(arrToSort, l, tempR, col);
-                    l = tempR;
+                    l = tempR; // ustawienie wartosci l na ostatni element sortowanej podtablicy
 
                 } else {
-                    partition = partition(arrToSort, l, tempR, col);
-                    arrToSort[tempR][col] = -arrToSort[tempR][col];
-                    tempR = partition - 1;
+                    partition = partition(arrToSort, l, tempR, col); // miejsce w ktorych na lewo od tego indeksu sa wartosci mniejsze a na prawo wieszke
+                    arrToSort[tempR][col] = -arrToSort[tempR][col]; // zaznaczenie zakresu na ktorym odbywala sie funkcja partition
+                    tempR = partition - 1; // zmiejszenie zakresu tablicy to sortowania
                     ++end;
                 }
 
@@ -77,13 +84,13 @@ class Source {
             if (end < 0)
                 break;
             l++;
-            tempR = findNextR(arrToSort, l, size, col);
-            arrToSort[tempR][col] = -arrToSort[tempR][col];
+            tempR = findNextR(arrToSort, l, size, col); // znalezienie zakresu kolejnej podtablicy do posortowania
+            arrToSort[tempR][col] = -arrToSort[tempR][col]; // naprawienie wartosci
         }
     }
 
-    //   public static void insertionSort(float[][] arr, )
-
+    //fukcja znajduje wartosc ktora jest < 0. Oznacza to ze wartosci od l do nowo znalezionego r nie sa jeszcze
+    //posortowane
     private static int findNextR(float[][] arr, int l, int size, int col) {
         for (int i = l; i < size; ++i) {
             if (arr[i][col] < 0)
@@ -92,6 +99,7 @@ class Source {
         return size - 1;
     }
 
+    //fukncja partition do podzialu prolemu na 2 mniejsze i czesciowe posortowanie tablicy.
     private static int partition(float[][] arr, int l, int r, int col) {
         float pivot = arr[(l + r) / 2][col];
         while (l <= r) {
@@ -108,13 +116,15 @@ class Source {
         return l;
     }
 
+    //fukncja ktora pozwala na wynoknanie sortowania metoda przez wstawianie. Zostala zmodyfikowana tak
+    //aby moc sortowac cale wiersze a nie tylko pojedyncze wartosci
     public static void insertionSort(float[][] arr, int l, int r, int col) {
-        int n = r;
+        int n = r; // rozmiar naszej tablicy do sortowania jest rowny r
         for (int i = l + 1; i <= n; ++i) {
-            float[] key = arr[i];
+            float[] key = arr[i]; // zapisujemy klucz czyli caly wiersz
             int j = i - 1;
 
-            while (j >= 0 && arr[j][col] > key[col]) {
+            while (j >= 0 && arr[j][col] > key[col]) { // sortujemy wiersze w oparciu o konkretna kolumne col
                 arr[j + 1] = arr[j];
                 j = j - 1;
             }
@@ -122,8 +132,10 @@ class Source {
         }
     }
 
+    //funkcja pozwalajaca na swap calych wierszy.
     public static void swapRows(float[][] arr, int l, int r) {
-        float[] tmp = arr[r];
+        float[] tmp = arr[r]; // zapisujemy caly dany wiersz do zmiennej tymaczsowej
+        //swap
         arr[r] = arr[l];
         arr[l] = tmp;
 
@@ -132,9 +144,9 @@ class Source {
 
     //Funkcje pomocnicze---
     public static void displayTsvTable(String[] tsvColumnName, float[][] tsvTable, int columns, int rows, String modifier, String SortByColumn, int singleColumn) {
-
+        //wyswietlenie modyfikatora wyswietlania i kolumny wedlug ktorej odbywa sie sortowanie
         System.out.println("$ " + modifier + " " + SortByColumn);
-
+        //jezeli modyfikator jest modyfikatorem all to wypisujemy cala tabele wraz z naglowkami i formatowaniem
         if (modifier.equals("all")) {
             for (int i = 0; i < tsvColumnName.length; i++) {
                 System.out.print(tsvColumnName[i] + "\t");
@@ -147,7 +159,7 @@ class Source {
                 }
                 System.out.println();
             }
-        } else if (modifier.equals("single")) {
+        } else if (modifier.equals("single")) { // jezeli modyfikator jest single to wypisujemy tylko wartosci z 1 kolumny rowniez sformatowane.
             System.out.println(SortByColumn);
             for (int i = 0; i < rows; i++) {
                 System.out.println(format.format(tsvTable[i][singleColumn]));
